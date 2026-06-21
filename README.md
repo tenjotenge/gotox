@@ -4,7 +4,7 @@ A desktop application for analyzing GitHub commit history and generating synthet
 
 ## Purpose
 
-gotox analyzes historical commit patterns from GitHub repositories to create realistic development schedules. By understanding developer behavior, commit frequency, and project patterns, it generates synthetic timelines that can be used for planning, estimation, or simulation.
+gotox analyzes historical commit patterns from GitHub repositories to create realistic development schedules. This tool is particularly useful for filling in commit history for projects that cannot be publicly represented, such as contract work under NDA, private client projects, or other confidential work. By analyzing your public GitHub activity, gotox can generate realistic schedules that reflect your actual development patterns and work habits.
 
 ## Architecture Overview
 
@@ -15,7 +15,7 @@ gotox follows a modular architecture with clear separation of concerns:
 - **Core Subsystems**: GitHub ingestion, analysis engine, schedule generator, commit executor
 - **Utilities Layer** (internal/util): Logging, error handling, and common utilities
 
-The system is designed for multi-agent development, with comprehensive documentation in the `docs/` folder serving as persistent system memory.
+The system is designed with comprehensive documentation in the `docs/` folder serving as technical reference.
 
 ## Project Structure
 
@@ -28,20 +28,20 @@ gotox/
 │   ├── ui/              # Fyne desktop interface
 │   ├── config/          # Configuration data structures
 │   ├── github/          # GitHub API integration
-│   ├── analysis/        # Commit history analysis
+│   ├── analysis/        # Commit history analysis and session extraction
 │   ├── schedule/        # Schedule generation
 │   ├── executor/        # Schedule execution
 │   ├── gitutil/         # Git utilities
 │   ├── verify/          # Data validation
 │   └── util/            # Logging and error handling
-├── docs/                # Comprehensive documentation
+├── docs/                # Technical documentation
 │   ├── architecture.md
 │   ├── data_flow.md
 │   ├── github_ingestion.md
 │   ├── schedule_model.md
+│   ├── session_model.md
 │   ├── commit_execution.md
-│   ├── ui_spec.md
-│   └── agent_handoff.md
+│   └── ui_spec.md
 ├── go.mod
 ├── go.sum
 └── README.md
@@ -75,39 +75,6 @@ gotox/
 - Rollback mechanisms
 - Safety features
 
-## Agent Interaction Guidelines
-
-### Cursor Agent
-**Role**: Incremental development, UI work, bug fixes
-
-**Focus Areas**:
-- Implementing UI features and forms
-- Adding input validation
-- Improving user experience
-- Fixing UI bugs and layout issues
-- Adding accessibility features
-
-**Key Files**:
-- `internal/ui/app.go`
-- `docs/ui_spec.md`
-
-### Devin Agent
-**Role**: Full-module generation, backend logic, complex features
-
-**Focus Areas**:
-- Implementing complete modules (GitHub, analysis, scheduling)
-- Adding new interfaces and implementations
-- Implementing complex algorithms
-- Adding comprehensive testing
-- Handling edge cases
-
-**Key Files**:
-- Module-specific implementations
-- Interface definitions
-- Module-specific documentation
-
-**Getting Started**: Read `docs/agent_handoff.md` for detailed guidance.
-
 ## Build Instructions
 
 ### Prerequisites
@@ -131,17 +98,15 @@ The application compiles to an executable that opens a Fyne window titled "gotox
 
 ## Documentation
 
-Comprehensive documentation is available in the `docs/` folder:
+Technical documentation is available in the `docs/` folder:
 
 - **architecture.md**: System architecture, module boundaries, design principles
 - **data_flow.md**: How data flows through the system
 - **github_ingestion.md**: GitHub API integration details
 - **schedule_model.md**: Schedule generation algorithm
+- **session_model.md**: Work session extraction and behavioral profiling
 - **commit_execution.md**: Commit execution implementation
 - **ui_spec.md**: UI specifications and future phases
-- **agent_handoff.md**: Guide for AI agents working on the project
-
-These documents are designed to enable new agents (Cursor, Devin, or humans) to start work without requiring prior conversation context.
 
 ## Current Status
 
@@ -170,12 +135,10 @@ These documents are designed to enable new agents (Cursor, Devin, or humans) to 
 
 ## Contributing
 
-This project is designed for multi-agent development. When contributing:
+When contributing to this project:
 
 1. Read the relevant documentation in `docs/`
 2. Follow the interface definitions in `internal/*`
 3. Maintain module boundaries
 4. Add tests for new functionality
 5. Update documentation as needed
-
-See `docs/agent_handoff.md` for detailed contribution guidelines.
