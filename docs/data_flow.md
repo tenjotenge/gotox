@@ -7,7 +7,7 @@ This document describes how data flows through the gotox system from user input 
 ## High-Level Flow
 
 ```
-User Input (UI) → Configuration → GitHub Ingestion → Analysis → Schedule Generation → Results Display
+User Input (UI) → Configuration → Pipeline Orchestration → GitHub Ingestion → Analysis → Schedule Generation → Results Display
 ```
 
 ## Detailed Data Flow
@@ -36,6 +36,29 @@ type Config struct {
     RandomSeed  int64
 }
 ```
+
+### Phase 1.5: Pipeline Orchestration
+
+**Input**: `Config` from configuration layer
+
+**Processing**:
+1. Pipeline receives configuration via `Pipeline.Run(ctx, cfg)`
+2. Context is propagated to all subsystems
+3. Progress handlers are registered for event reporting
+4. Phases are executed sequentially with error handling
+5. Results are aggregated into `pipeline.Result`
+
+**Output**: `*pipeline.Result` containing:
+- RepositoryData (artifacts from ingestion)
+- AnalysisResult (artifacts from analysis)
+- GeneratedSchedule (artifacts from schedule generation)
+- ExecutionResults (artifacts from execution)
+- Phase summaries (derived views)
+
+**Error Handling**:
+- Context cancellation stops all phases
+- Phase failures halt pipeline and return error
+- Partial results are preserved in Result struct
 
 ### Phase 2: GitHub Ingestion
 
@@ -184,6 +207,7 @@ type ExecutionResult struct {
 | Phase | Input | Output | Transformation |
 |-------|-------|--------|----------------|
 | Config | User input | Config struct | Validation and struct assembly |
+| Pipeline | Config | Result | Orchestration and aggregation |
 | Ingestion | Config | RepositoryData | API calls and filtering |
 | Analysis | RepositoryData | AnalysisResult | Pattern extraction and statistics |
 | Generation | AnalysisResult | Schedule | Task creation and timeline building |

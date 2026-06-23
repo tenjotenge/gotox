@@ -24,6 +24,15 @@ gotox is a modular desktop application built with Go and Fyne that analyzes GitH
 └────────────────────┬────────────────────────────────────┘
                      │
 ┌────────────────────▼────────────────────────────────────┐
+│           Pipeline Orchestration Layer                   │
+│                (internal/pipeline)                        │
+│  - Coordinates execution flow                            │
+│  - Manages progress reporting                            │
+│  - Handles context propagation                           │
+│  - Aggregates results                                    │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
 │              Core Subsystems                            │
 │                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
@@ -70,6 +79,17 @@ gotox is a modular desktop application built with Go and Fyne that analyzes GitH
 - Validate configuration
 
 **Dependencies**: None (pure data structures)
+
+### internal/pipeline
+**Purpose**: Pipeline orchestration and coordination
+**Responsibilities**:
+- Coordinate execution flow through all subsystems
+- Manage progress reporting
+- Handle context propagation
+- Aggregate results from all phases
+
+**Interface**: `Pipeline`
+**Dependencies**: All subsystems (github, analysis, schedule, executor, verify)
 
 ### internal/github
 **Purpose**: GitHub API integration

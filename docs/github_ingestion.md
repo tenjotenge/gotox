@@ -8,9 +8,9 @@ The GitHub ingestion module (`internal/github`) is responsible for fetching comm
 
 ```go
 type Ingestor interface {
-    FetchCommits(cfg *config.GitHubConfig, startYear, endYear int) ([]RepositoryData, error)
+    FetchCommits(ctx context.Context, cfg *config.GitHubConfig, startYear, endYear int) ([]RepositoryData, error)
     ValidateCredentials(username, pat string) error
-    FetchRepositories(username, pat string) ([]config.Repository, error)
+    FetchRepositories(ctx context.Context, username, pat string) ([]config.Repository, error)
 }
 ```
 

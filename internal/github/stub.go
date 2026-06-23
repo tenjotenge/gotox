@@ -25,6 +25,6 @@ func (s *StubIngestor) ValidateCredentials(username, pat string) error {
 }
 
 // FetchRepositories is a stub implementation that returns empty list
-func (s *StubIngestor) FetchRepositories(username, pat string) ([]config.Repository, error) {
+func (s *StubIngestor) FetchRepositories(ctx context.Context, username, pat string) ([]config.Repository, error) {
 	return []config.Repository{}, nil
 }
