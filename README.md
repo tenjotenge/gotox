@@ -49,31 +49,33 @@ gotox/
 
 ## Development Phases
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation (Complete)
 - Project scaffold and architecture
-- Basic UI shell with placeholder labels
 - Configuration structures
 - Interface definitions
 - Documentation
 
-### Phase 2: Input and Generation
-- Real input forms for GitHub credentials
-- GitHub API integration
-- Commit history fetching
-- Basic analysis engine
-- Schedule generation
+### Phase 2: UI Implementation (Complete)
+- Fully functional Fyne-based desktop interface
+- Complete configuration forms for all backend parameters
+- GitHub username and PAT input (masked password field)
+- Dynamic repository list management (add/remove)
+- Analysis year range and random seed configuration
+- Scheduling parameters (work hours, complexity, buffer)
+- Real-time status reporting and progress tracking
+- Error display and result summaries
+- Pipeline execution with UI state management
 
-### Phase 3: Visualization
-- Progress indicators
+### Phase 3: Backend Integration (Current)
+- GitHub API integration with real client
+- Commit history fetching and analysis
+- Schedule generation with actual algorithms
+- Execution and verification phases
+
+### Phase 4: Visualization (Future)
 - Analysis visualizations
 - Schedule timeline display
 - Export functionality
-
-### Phase 4: Execution (Optional)
-- Schedule execution capabilities
-- Git commit generation
-- Rollback mechanisms
-- Safety features
 
 ## Build Instructions
 
@@ -96,6 +98,55 @@ go run cmd/gotox
 ### Build Output
 The application compiles to an executable that opens a Fyne window titled "gotox".
 
+## Usage
+
+### Getting Started
+
+1. **Launch the Application**: Run `go run cmd/gotox` or execute the compiled binary
+2. **Configure GitHub Settings**:
+   - Enter your GitHub username
+   - Optionally provide a GitHub Personal Access Token (PAT) for higher API rate limits
+   - Add target repositories in `owner/repo` format (e.g., `octocat/hello-world`)
+3. **Set Analysis Parameters**:
+   - Specify the year range for commit history analysis
+   - Set a random seed for reproducible results
+4. **Adjust Scheduling** (optional):
+   - Configure work hours per day
+   - Set task complexity multiplier
+   - Adjust buffer percentage for schedule padding
+5. **Generate Schedule**:
+   - Click the "Generate" button to start the pipeline
+   - Monitor progress in the status section
+   - View results in the completion dialog
+
+### Configuration via UI
+
+The application is designed to be fully configurable through the UI without requiring environment variables:
+
+- **GitHub Username**: Required field for identifying the account to analyze
+- **Personal Access Token**: Optional field for GitHub API authentication
+  - Without PAT: Uses stub mode with limited functionality
+  - With PAT: Enables real GitHub API integration
+- **Target Repositories**: Dynamic list where you can add/remove repositories
+- **Analysis Period**: Start and end years for commit history analysis
+- **Random Seed**: Controls reproducibility of generated schedules
+- **Scheduling Parameters**: Fine-tune schedule generation behavior
+
+### Environment Variables (Optional)
+
+While the UI provides complete configuration, environment variables can still be used:
+
+- `GITHUB_PAT`: GitHub Personal Access Token (overrides UI setting if provided)
+
+### Stub Mode vs. Real Mode
+
+The application operates in two modes:
+
+- **Stub Mode** (default): Uses mock implementations for all backend components. Useful for UI testing and development.
+- **Real Mode**: Activated when a valid GitHub PAT is provided. Enables actual GitHub API integration, commit analysis, and schedule generation.
+
+The mode is automatically detected based on whether a PAT is provided via the UI or environment variable.
+
 ## Documentation
 
 Technical documentation is available in the `docs/` folder:
@@ -110,19 +161,26 @@ Technical documentation is available in the `docs/` folder:
 
 ## Current Status
 
-**Phase 1 Complete**:
+**Phase 1 & 2 Complete**:
 - ✅ Project scaffold with proper structure
 - ✅ Configuration data structures
 - ✅ Interface definitions for all major subsystems
-- ✅ Basic Fyne UI with placeholder labels
+- ✅ Fully functional Fyne UI with real input controls
 - ✅ Logging and error handling utilities
 - ✅ Comprehensive documentation
+- ✅ Complete UI-to-backend pipeline integration
+- ✅ Real-time progress reporting and error handling
+
+**Current Phase**: Backend Integration
+- GitHub API client implementation
+- Analysis engine development
+- Schedule generation algorithms
 
 **Next Steps**:
-- Implement GitHub API integration
-- Add real input forms to UI
-- Implement commit history analysis
+- Complete GitHub API integration
+- Implement analysis engine with real algorithms
 - Add schedule generation logic
+- Implement execution and verification phases
 
 ## Dependencies
 
