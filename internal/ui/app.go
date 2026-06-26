@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
 
 	"gotox/internal/config"
@@ -325,8 +326,11 @@ func (a *App) buildStatusSection() *widget.Card {
 	progressBar.Max = 1.0
 	progressBar.Value = 0.0
 
-	// Log output
-	logOutput := widget.NewTextGrid()
+	// Log output - use Entry for selectable text
+	logOutput := widget.NewEntry()
+	logOutput.MultiLine = true
+	logOutput.ReadOnly = true
+	logOutput.SetPlaceHolder("Log output will appear here...")
 
 	// Store references
 	a.statusLabel = statusLabel
@@ -416,13 +420,13 @@ func (a *App) readConfig() (*config.Config, error) {
 
 	// Repositories
 	for _, repoStr := range a.repoItems {
-		var owner, name string
-		if _, err := fmt.Sscanf(repoStr, "%[^/]/%s", &owner, &name); err != nil || owner == "" || name == "" {
+		parts := strings.Split(repoStr, "/")
+		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
 			return nil, fmt.Errorf("invalid repository format: %s (expected owner/repo)", repoStr)
 		}
 		cfg.GitHub.Repositories = append(cfg.GitHub.Repositories, config.Repository{
-			Owner: owner,
-			Name:  name,
+			Owner: parts[0],
+			Name:  parts[1],
 		})
 	}
 
@@ -486,32 +490,39 @@ func (a *App) readConfig() (*config.Config, error) {
 // handleProgressEvent handles progress events from the pipeline
 func (a *App) handleProgressEvent(event pipeline.ProgressEvent) {
 	message := fmt.Sprintf("[%s] %s", event.Phase, event.Message)
-	a.appendLog(message)
 
-	switch event.Type {
-	case pipeline.EventTypeStarted:
-		a.setStatus(fmt.Sprintf("Running: %s", event.Phase), widget.MediumImportance)
-	case pipeline.EventTypeCompleted:
-		a.setStatus(fmt.Sprintf("Completed: %s", event.Phase), widget.SuccessImportance)
-	case pipeline.EventTypeFailed:
-		errorMsg := ""
-		if err, ok := event.Metadata["error"].(string); ok {
-			errorMsg = err
+	fyne.Do(func() {
+		a.appendLog(message)
+
+		switch event.Type {
+		case pipeline.EventTypeStarted:
+			a.setStatus(fmt.Sprintf("Running: %s", event.Phase), widget.MediumImportance)
+		case pipeline.EventTypeCompleted:
+			a.setStatus(fmt.Sprintf("Completed: %s", event.Phase), widget.SuccessImportance)
+		case pipeline.EventTypeFailed:
+			errorMsg := ""
+			if err, ok := event.Metadata["error"].(string); ok {
+				errorMsg = err
+			}
+			a.showError(fmt.Sprintf("%s failed", event.Phase), errors.New(errorMsg))
+			a.setStatus(fmt.Sprintf("Failed: %s", event.Phase), widget.DangerImportance)
 		}
-		a.showError(fmt.Sprintf("%s failed", event.Phase), errors.New(errorMsg))
-		a.setStatus(fmt.Sprintf("Failed: %s", event.Phase), widget.DangerImportance)
-	}
+	})
 }
 
 // setStatus updates the status label
 func (a *App) setStatus(message string, importance widget.Importance) {
-	a.statusLabel.SetText(message)
-	a.statusLabel.Importance = importance
+	fyne.Do(func() {
+		a.statusLabel.SetText(message)
+		a.statusLabel.Importance = importance
+	})
 }
 
 // setProgress updates the progress bar
 func (a *App) setProgress(value float64) {
-	a.progressBar.SetValue(value)
+	fyne.Do(func() {
+		a.progressBar.SetValue(value)
+	})
 }
 
 // setRunning updates the UI state for running/not running
@@ -520,28 +531,30 @@ func (a *App) setRunning(running bool) {
 	a.isRunning = running
 	a.statusLock.Unlock()
 
-	// Disable/enable all input fields
-	widgets := []fyne.Disableable{
-		a.usernameEntry,
-		a.patEntry,
-		a.repoEntry,
-		a.startYearEntry,
-		a.endYearEntry,
-		a.seedEntry,
-		a.workHoursEntry,
-		a.complexityEntry,
-		a.bufferEntry,
-	}
-
-	for _, w := range widgets {
-		w.Disable()
-	}
-
-	if !running {
-		for _, w := range widgets {
-			w.Enable()
+	fyne.Do(func() {
+		// Disable/enable all input fields
+		widgets := []fyne.Disableable{
+			a.usernameEntry,
+			a.patEntry,
+			a.repoEntry,
+			a.startYearEntry,
+			a.endYearEntry,
+			a.seedEntry,
+			a.workHoursEntry,
+			a.complexityEntry,
+			a.bufferEntry,
 		}
-	}
+
+		for _, w := range widgets {
+			w.Disable()
+		}
+
+		if !running {
+			for _, w := range widgets {
+				w.Enable()
+			}
+		}
+	})
 }
 
 // appendLog adds a line to the log output
@@ -553,7 +566,9 @@ func (a *App) appendLog(message string) {
 
 // showError displays an error dialog
 func (a *App) showError(title string, err error) {
-	dialog.ShowError(err, a.window)
+	fyne.Do(func() {
+		dialog.ShowError(err, a.window)
+	})
 	a.appendLog(fmt.Sprintf("ERROR: %s: %v", title, err))
 }
 
@@ -574,5 +589,7 @@ func (a *App) showResultSummary(result *pipeline.Result) {
 		summary += fmt.Sprintf("\nError: %v", result.Error)
 	}
 
-	dialog.ShowInformation("Generation Complete", summary, a.window)
+	fyne.Do(func() {
+		dialog.ShowInformation("Generation Complete", summary, a.window)
+	})
 }
